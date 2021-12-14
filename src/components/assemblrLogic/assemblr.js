@@ -104,7 +104,6 @@ const InstructionTable = {
 
 export const secondPass = (string, list) => {
   let LC = 0;
-  console.log(list);
   // list: Object
   // data Type
   // LC: int
@@ -122,27 +121,27 @@ export const secondPass = (string, list) => {
       let lcVal = 0;
 
       // LC 값 찾기
-      Object.keys(list).forEach(item => {
-        if(list[item].LC === LC) lcVal = item;
-      })
+      Object.keys(list).forEach((item) => {
+        if (list[item].LC === LC) lcVal = item;
+      });
 
       // LC 못찾으면
-      if(lcVal === 0) callError("type of lcVal");
-      
-      const operand = '0000' + " " + HexToBin16(list[lcVal].value.toString(), 3);
+      if (lcVal === 0) callError('type of lcVal');
+
+      const operand =
+        '0000' + ' ' + HexToBin16(list[lcVal].value.toString(), 3);
       lists[LC] = {
         LC,
-        operand
-      }
+        instruction: operand,
+      };
       LC++;
-      return
-    };
+      return;
+    }
 
     // pseudo code
     if (inst === 'ORG') {
       // ORG인 경우
       LC = parseInt(newLine.slice(3));
-      console.log(LC);
       return;
     } else if (inst === 'END') {
       // END인 경우
@@ -150,32 +149,33 @@ export const secondPass = (string, list) => {
       return;
     }
 
-    // MRI 
+    // 존재하지 않는 명령어
+    if (!InstructionTable[inst]) callError('Table에서 조회되지 않는 명령어');
+
+    // MRI
     if (InstructionTable[inst].kind === 'MRI') {
       // 명령어 부분 자르기
-      const op_Code = newLine.slice(3);
-      console.log(`op_Code: ${op_Code}`);
-      console.log(list);
+      const MRI_Operand = newLine.slice(3);
+      console.log(`MRI_Operand: ${MRI_Operand}`);
+      console.log('list:', list);
       let lcVal = 0;
 
       // LC 값 찾기
-      Object.keys(list).forEach(item => {
-        if(list[item].label === op_Code) lcVal = list[item].LC;
-      })
+      Object.keys(list).forEach((item) => {
+        if (list[item].label === MRI_Operand) lcVal = list[item].LC;
+      });
 
       // LC 못찾으면
-      if(lcVal === 0) callError("type of lcVal");
+      if (lcVal === 0) callError('type of lcVal: ' + inst);
 
       // 12자리 operand
       const value = HexToBin16(lcVal.toString(), 3);
       const opCodeBin = bin4fromHex(InstructionTable[inst].hex);
-      console.log(`value: ${value}`);
-      console.log(`opCodeBin: ${opCodeBin}`);
       // 4자리 op_code + 12자리 operand 합치기
       const operand = opCodeBin + ' ' + value;
       lists[LC] = {
         LC,
-        operand,
+        instruction: operand,
       };
       LC++;
     }
@@ -184,11 +184,11 @@ export const secondPass = (string, list) => {
       const operand = InstructionTable[inst].hex;
       lists[LC] = {
         LC,
-        operand,
+        instruction: operand,
       };
       LC++;
     } else {
-      callError('second Pass - type of inst');
+      callError('second Pass - type of inst' + inst);
     }
   });
 
@@ -216,7 +216,7 @@ export const firstPass = (string) => {
       // ORG인 경우
       if (isORG === 'ORG') {
         const ORG_value = Number(newLine.slice(3));
-        if (isNaN(ORG_value)) callError('ORG value Type');
+        if (isNaN(ORG_value)) callError('ORG value Type' + ORG_value);
         // Set Location counter -> continue
         LC = ORG_value;
         return;
@@ -257,7 +257,6 @@ export const firstPass = (string) => {
       LC++;
     }
   });
-  console.log(listing);
   return symbolAddressTable(listing);
 };
 
@@ -297,7 +296,7 @@ const symbolAddressTable = (list) => {
     };
     memoryWord++;
   });
-  return {result, list};
+  return { result, list };
 };
 
 const convertCharToBin = (two) => {
@@ -369,7 +368,7 @@ function HexToBin16(st, num) {
     let a = parseInt(hex.slice(i, i + 1), 16).toString(2);
     const len = a.length;
     for (let j = 0; j < 4 - len; j++) a = '0' + a;
-    result += a + " ";
+    result += a + ' ';
   }
   return result.slice(0, -1);
 }

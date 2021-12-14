@@ -3,3 +3,34 @@
   flex-direction: column;
   align-items: center;
 }
+.source{
+  display: flex;
+  flex-direction: column;
+}
+
+.tableSet {
+  width:100vw;
+  min-width: 1200px;
+  display: flex;
+  justify-content: center;
+}
+
+.table{
+  width: 40%
+}
+.btn{
+  all: unset;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: .9rem;
+  color:black;
+  transition: all .22s ease ;
+}
+
+.btn:hover{
+  background-color: black;
+  color:white
+}
